@@ -23,7 +23,8 @@ var app = new Vue({
           point.push(data.high);
           points.push(point);
         }
-        Highcharts.stockChart('container', {
+
+        Highcharts.stockChart('graphique', {
             rangeSelector: {
                 selected: 1
             },

@@ -7,7 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.js"></script>
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-
+    <script src="js/highstock.js"></script>
+    <script src="js/exporting.js"></script>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
 
@@ -50,10 +51,9 @@
           <option value="null">Séléctionnez</option>
           <option v-for="monnaie in monnaies" v-bind:value="monnaie.name">{{ monnaie.name }}</option>
         </select>
+        <div id="graphique"></div>
       </div>
     </div>
-    <script src="js/highstock.js"></script>
-    <script src="js/exporting.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="js/script.js"></script>
   </body>
