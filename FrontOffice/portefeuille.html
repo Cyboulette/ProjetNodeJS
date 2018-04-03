@@ -27,10 +27,62 @@
         </ul>
       </div>
     </nav>
-    <div class="container">
-
+    <div id="portefeuille" class="container">
+      <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link" id="pills-buy-tab" data-toggle="pill" href="#pills-buy" role="tab" aria-controls="pills-buy" aria-selected="false">Acheter</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-sell-tab" data-toggle="pill" href="#pills-sell" role="tab" aria-controls="pills-sell" aria-selected="false">Vendre</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" id="pills-historic-tab" data-toggle="pill" href="#pills-historic" role="tab" aria-controls="pills-historic" aria-selected="true">Historique</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade" id="pills-buy" role="tabpanel" aria-labelledby="pills-buy-tab">
+          <form method="post">
+            <div class="form-group">
+              <label for="monselect">Monnaie</label>
+              <select id="monselect" class="custom-select form-control" v-model="selected">
+                <option class="form-control" value="null">Séléctionnez</option>
+                <option class="form-control" v-for="monnaie in monnaies" v-bind:value="monnaie.name">{{ monnaie.name }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <input class="form-control mr-sm-2" ref="input_buy" type="number" placeholder="Saisir le nombre à acheter">
+            </div>
+            <button @click.prevent="buy()" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Acheter</button>
+          </form>
+          <div id="alert-buy">
+            
+          </div>
+        </div>
+        <div class="tab-pane fade" id="pills-sell" role="tabpanel" aria-labelledby="pills-sel-tab">
+          <form method="post">
+            <div class="form-group">
+            <label for="monselect">Monnaie</label>
+            <select id="monselect" class="custom-select" v-model="selected">
+              <option class="form-control" value="null">Séléctionnez</option>
+              <option class="form-control" v-for="monnaie in monnaies" v-bind:value="monnaie.name">{{ monnaie.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <input class="form-control mr-sm-2" type="number" placeholder="Saisir le nombre à vendre">
+          </div>
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Vendre</button>
+          </form>
+        </div>
+        <div class="tab-pane fade  show active" id="pills-historic" role="tabpanel" aria-labelledby="pills-historic-tab">
+          <select id="monselect" class="custom-select" v-model="selected" @change="updateGraph">
+            <option class="form-control" value="null">Séléctionnez</option>
+            <option class="form-control" v-for="monnaie in monnaies" v-bind:value="monnaie.name">{{ monnaie.name }}</option>
+          </select>
+          <div id="graphique" class="my-2 lead"></div>
+        </div>
+      </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/portefeuille.js"></script>
   </body>
 </html>

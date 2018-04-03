@@ -53,8 +53,3 @@ var app = new Vue({
     }
   }
 });
-
-// var app = new Vue({
-//   el : '#bourse',
-//   data :
-// });
