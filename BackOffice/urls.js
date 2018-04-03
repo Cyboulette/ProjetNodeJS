@@ -123,7 +123,7 @@ module.exports = function(app, db) {
 									if(portefeuilleMonnaie != null) {
 										newSolde = portefeuilleMonnaie.solde += equivalentEnCrypto;
 										var temp = portefeuilleMonnaie.historique;
-										temp.push({time: time, amount: equivalentEnCrypto, total: newSolde, operation: '+'});
+										temp.push({time: time, operation: '+', amount: equivalentEnCrypto, total: newSolde});
 										newHistorique = temp;
 									}
 
@@ -131,6 +131,68 @@ module.exports = function(app, db) {
 									portefeuilleCollection.updateOne({name: monnaie.name}, {$set: {solde: newSolde, historique: newHistorique}}, {upsert: true});
 									// On met à jour notre portefeuille d'euros
 									portefeuilleCollection.updateOne({name: "EUR"}, {$set: {solde: newSoldeEuros}});
+
+									res.json({
+										success: true,
+										soldeRestantEuros: newSoldeEuros,
+										soldeRestantMonnaie: newSolde,
+										monnaie: monnaie.name
+									});
+								});
+							}
+						});
+					} else {
+						res.status(400);
+						res.json({
+							message: "The amount need to be a correct float"
+						});
+					}
+				}
+			}
+		});
+	});
+
+	// Amount = le montant désiré de vendre !
+	app.post('/api/portefeuille/:monnaie/vendre', function(req, res, next){
+		monnaiesCollection.findOne({name: req.params.monnaie}, function(err, monnaie) {
+			if(err) {
+				res.send(err);
+			} else {
+				if(monnaie == null) {
+					res.status(404);
+					res.json({
+						message: "This monnaie doesn't exists !"
+					});
+				} else {
+					if(req.body.amount != null && !isNaN(parseFloat(req.body.amount)) && req.body.amount > 0) {
+						var amount = parseFloat(req.body.amount);
+						var lastValueInEuro = monnaie.historique[monnaie.historique.length-1].price;
+						var equivalentEnEuro = amount * lastValueInEuro;
+
+						portefeuilleCollection.findOne({name: monnaie.name}, function(err, crypto) {
+							if(crypto == null || crypto.solde <= amount) {
+								res.json({
+									message: "You don't have enough "+monnaie.name+' you can\'t sold more than you have'
+								});
+							} else {
+								portefeuilleCollection.findOne({name: "EUR"}, function(err, euros) {
+									var time = new Date().getTime(); // Timestamp de la requête
+									var newSolde = crypto.solde - amount; // Le nouveau solde de la monnaie désirée converti via l'euro
+									var newSoldeEuros = euros.solde + equivalentEnEuro; // Le nouveau solde euros
+									var temp = crypto.historique;
+									temp.push({time: time, operation: '-', amount: amount, total: newSolde});
+									var newHistorique = temp;
+
+									var temp2 = euros.historique;
+									temp2.push({time: time, operation: '+', amount: equivalentEnEuro, total: newSoldeEuros});
+									var newHistoriqueEuros = temp2;
+
+									// On utilise un UPSERT : on fait un update si ça existe déjà, sinon on INSERT
+									//portefeuilleCollection.updateOne({name: monnaie.name}, {$set: {solde: newSolde, historique: newHistorique}}, {upsert: true});
+									// On met à jour notre portefeuille d'euros
+									portefeuilleCollection.updateOne({name: crypto.name}, {$set: {solde: newSolde, historique: newHistorique}});
+									// On met à jour notre portefeuille d'euros
+									portefeuilleCollection.updateOne({name: "EUR"}, {$set: {solde: newSoldeEuros, historique: newHistoriqueEuros}});
 
 									res.json({
 										success: true,
