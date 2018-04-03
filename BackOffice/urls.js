@@ -117,13 +117,13 @@ module.exports = function(app, db) {
 								var time = new Date().getTime(); // Timestamp de la requête
 								var newSolde = equivalentEnCrypto; // Le nouveau solde de la monnaie désirée converti via l'euro
 								var newSoldeEuros = euros.solde - amount; // Le nouveau solde euros
-								var newHistorique = [{time: time, operation: '+ '+newSolde}];
+								var newHistorique = [{time: time, amount: newSolde, operation: '+'}];
 
 								portefeuilleCollection.findOne({name: monnaie.name}, function(err, portefeuilleMonnaie) {
 									if(portefeuilleMonnaie != null) {
 										newSolde = portefeuilleMonnaie.solde += equivalentEnCrypto;
 										var temp = portefeuilleMonnaie.historique;
-										temp.push({time: time, operation: '+ '+equivalentEnCrypto});
+										temp.push({time: time, amount: equivalentEnCrypto, operation: '+'});
 										newHistorique = temp;
 									}
 
