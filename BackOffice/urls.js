@@ -87,51 +87,68 @@ module.exports = function(app, db) {
 		});
 	});
 
-	// ammount = le montant en EUR
+	// Amount = le montant désiré d'achat en EUROS.
+	// Exemple : Je veux acheter pour amount=100€ d'ETH.
+	// Si 1 ETH = 396.04 € alors 100 € = 0.25 ETH achetés
 	app.post('/api/portefeuille/:monnaie', function(req, res, next) {
-		monnaiesCollection.findOne({name: req.params.monnaie}, function(err, result) {
+		monnaiesCollection.findOne({name: req.params.monnaie}, function(err, monnaie) {
 			if(err) {
 				res.send(err);
 			} else {
-				if(result == null) {
+				if(monnaie == null) {
 					res.status(404);
 					res.json({
 						message: "This monnaie doesn't exists !"
 					});
 				} else {
-					if(req.body.ammount != null && !isNaN(parseFloat(req.body.ammount))) {
-						var ammount = parseFloat(req.body.ammount);
-						portefeuilleCollection.findOne({name: "EUR"}, function(err, result2) {
-							if(result2 == null || result2.solde <= ammount) {
+					if(req.body.amount != null && !isNaN(parseFloat(req.body.amount)) && req.body.amount > 0) {
+						var amount = parseFloat(req.body.amount);
+						var lastValueInEuro = monnaie.historique[monnaie.historique.length-1].price;
+						var equivalentEnCrypto = amount / lastValueInEuro;
+						// On cherche le portefeuille actuelle en EUROS de la personne
+						portefeuilleCollection.findOne({name: "EUR"}, function(err, euros) {
+							// Si le solde est insuffisant
+							if(euros == null || euros.solde <= amount) {
 								res.json({
-									message: "Your ammount in EUR is not sufficient"
+									message: "Your amount in EUR is not sufficient"
 								});
 							} else {
-								res.json({
-									message: "gg",
-									soldeRestant: result2.solde
-								})
+								// Sinon
+								var time = new Date().getTime(); // Timestamp de la requête
+								var newSolde = equivalentEnCrypto; // Le nouveau solde de la monnaie désirée converti via l'euro
+								var newSoldeEuros = euros.solde - amount; // Le nouveau solde euros
+								var newHistorique = [{time: time, operation: '+ '+newSolde}];
+
+								portefeuilleCollection.findOne({name: monnaie.name}, function(err, portefeuilleMonnaie) {
+									if(portefeuilleMonnaie != null) {
+										newSolde = portefeuilleMonnaie.solde += equivalentEnCrypto;
+										var temp = portefeuilleMonnaie.historique;
+										temp.push({time: time, operation: '+ '+equivalentEnCrypto});
+										newHistorique = temp;
+									}
+
+									// On utilise un UPSERT : on fait un update si ça existe déjà, sinon on INSERT
+									portefeuilleCollection.updateOne({name: monnaie.name}, {$set: {solde: newSolde, historique: newHistorique}}, {upsert: true});
+									// On met à jour notre portefeuille d'euros
+									portefeuilleCollection.updateOne({name: "EUR"}, {$set: {solde: newSoldeEuros}});
+
+									res.json({
+										success: true,
+										soldeRestantEuros: newSoldeEuros,
+										soldeRestantMonnaie: newSolde,
+										monnaie: monnaie.name
+									});
+								});
 							}
 						});
-						/*var ammount = parseFloat(req.body.ammount);
-						res.json({
-							message: "GG",
-							ammount: ammount
-						});*/
 					} else {
 						res.status(400);
 						res.json({
-							message: "The ammount need to be a correct float"
+							message: "The amount need to be a correct float"
 						});
 					}
 				}
 			}
 		});
 	});
-
-	/*
-		TODO :
-			- Historique de transactions dans le portefeuille
-			
-	*/
 }
