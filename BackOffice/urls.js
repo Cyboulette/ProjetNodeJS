@@ -127,10 +127,14 @@ module.exports = function(app, db) {
 										newHistorique = temp;
 									}
 
+									var temp2 = euros.historique;
+									temp2.push({time: time, operation: '-', amount: amount, total: newSoldeEuros});
+									var newHistoriqueEuros = temp2;
+
 									// On utilise un UPSERT : on fait un update si ça existe déjà, sinon on INSERT
 									portefeuilleCollection.updateOne({name: monnaie.name}, {$set: {solde: newSolde, historique: newHistorique}}, {upsert: true});
 									// On met à jour notre portefeuille d'euros
-									portefeuilleCollection.updateOne({name: "EUR"}, {$set: {solde: newSoldeEuros}});
+									portefeuilleCollection.updateOne({name: "EUR"}, {$set: {solde: newSoldeEuros, historique: newHistoriqueEuros}});
 
 									res.json({
 										success: true,
