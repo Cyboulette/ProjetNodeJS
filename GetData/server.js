@@ -30,7 +30,9 @@ MongoClient.connect('mongodb://localhost:27017', function(err, client) {
 				historique: [
 					{
 						time: new Date().getTime(),
-						operation: "+ 10000"
+						operation: "+",
+						amount: 10000,
+						total: 10000
 					}
 				]
 			}, function(err, result) {
