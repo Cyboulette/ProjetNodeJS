@@ -143,9 +143,8 @@ module.exports = function(app, db, axios) {
 				res.send(err);
 			} else {
 				if(monnaie == null) {
-					res.status(404);
 					res.json({
-						message: "This monnaie doesn't exists !"
+						message: "Cette crypto-monnaie n'existe pas"
 					});
 				} else {
 					if(req.body.amount != null && !isNaN(parseFloat(req.body.amount)) && req.body.amount > 0) {
@@ -157,7 +156,7 @@ module.exports = function(app, db, axios) {
 							// Si le solde est insuffisant
 							if(euros == null || euros.solde < amount) {
 								res.json({
-									message: "Your amount in EUR is not sufficient"
+									message: "Vous ne possédez pas assez d'euros pour acheter"
 								});
 							} else {
 								// Sinon
@@ -193,9 +192,8 @@ module.exports = function(app, db, axios) {
 							}
 						});
 					} else {
-						res.status(400);
 						res.json({
-							message: "The amount need to be a correct float"
+							message: "Le montant doit être un flottant correct"
 						});
 					}
 				}
@@ -210,9 +208,8 @@ module.exports = function(app, db, axios) {
 				res.send(err);
 			} else {
 				if(monnaie == null) {
-					res.status(404);
 					res.json({
-						message: "This monnaie doesn't exists !"
+						message: "Cette crypto-monnaie n'existe pas"
 					});
 				} else {
 					if(req.body.amount != null && !isNaN(parseFloat(req.body.amount)) && req.body.amount > 0) {
@@ -223,7 +220,7 @@ module.exports = function(app, db, axios) {
 						portefeuilleCollection.findOne({name: monnaie.name}, function(err, crypto) {
 							if(crypto == null || crypto.solde < amount) {
 								res.json({
-									message: "You don't have enough "+monnaie.name+' you can\'t sold more than you have'
+									message: "Vous ne possédez pas assez de "+monnaie.name+', vous ne pouvez pas vendre plus que ce que vous possédez'
 								});
 							} else {
 								portefeuilleCollection.findOne({name: "EUR"}, function(err, euros) {
@@ -255,9 +252,8 @@ module.exports = function(app, db, axios) {
 							}
 						});
 					} else {
-						res.status(400);
 						res.json({
-							message: "The amount need to be a correct float"
+							message: "Le montant doit être un flottant correct"
 						});
 					}
 				}
