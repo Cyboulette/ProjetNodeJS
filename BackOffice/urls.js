@@ -58,7 +58,7 @@ module.exports = function(app, db) {
 			} else {
 				if(result2 == null) {
 					data = {
-						name: result2.name,
+						name: req.params.monnaie,
 						solde: 0.0,
 						historique: []
 					};
