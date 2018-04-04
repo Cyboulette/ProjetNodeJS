@@ -1,7 +1,67 @@
-module.exports = function(app, db) {
+module.exports = function(app, db, axios) {
 	var monnaiesCollection = db.collection('monnaies');
 	var portefeuilleCollection = db.collection('portefeuille');
 	var ObjectId = require('mongodb').ObjectID;
+
+	app.get('/api/setup', function(req, res, next){
+		var monnaies = [{name: "BTC"}, {name: "ETH"}, {name: "42"}]; // Monnaies à récupérer depuis l'API pour le setup via Axios
+
+		// On vide les portefeuilles
+		portefeuilleCollection.drop();
+
+		// On setup le portefeuille en euros de base
+		portefeuilleCollection.insertOne({
+			name: "EUR",
+			solde: 10000,
+			historique: [
+				{
+					time: new Date().getTime(),
+					operation: "+",
+					amount: 10000,
+					total: 10000
+				}
+			]
+		});
+
+		// On vide toutes les crypto-monnaies
+		monnaiesCollection.drop();
+		var monnaiesData = [];
+		var promises = [];
+		for(let i in monnaies) {
+			promises.push(axios({
+				method: 'GET',
+				url: 'https://min-api.cryptocompare.com/data/histoday?fsym='+monnaies[i].name+'&tsym=EUR&allData=true',
+				responseType: 'json'
+			}).then(function(response) {
+				let data = response.data.Data;
+				let objHistorique = {
+					name: monnaies[i].name
+				}
+				let historiques = [];
+				for(let j in data) {
+					historiques.push({
+						time: data[j].time*1000,
+						price: data[j].high
+					});
+				}
+				objHistorique.historique = historiques;
+				monnaiesData.push(objHistorique);
+			}));
+		}
+
+		axios.all(promises).then(function(results) {
+			monnaiesCollection.insertMany(monnaiesData, {}, function(err, result) {
+				if(err) {
+					res.send(err);
+				} else {
+					res.json({
+						status: 200,
+						message: 'Toutes les données ont bien été insérées !'
+					});
+				}
+			})
+		});
+	});
 
 	app.get('/api/monnaies', function(req, res, next) {
 		monnaiesCollection.find({}).project({name: 1}).toArray(function(err, result) {

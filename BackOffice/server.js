@@ -5,6 +5,7 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
 var cors = require('cors');
+var axios = require('axios');
 var hostname = 'localhost';
 var port = 8080;
 
@@ -20,7 +21,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, client) {
 		console.log(err);
 	} else {
 		var routes = require('./urls.js');
-		routes(app, db);
+		routes(app, db, axios);
 	}
 });
 
