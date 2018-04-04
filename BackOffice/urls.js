@@ -95,7 +95,7 @@ module.exports = function(app, db) {
 						// On cherche le portefeuille actuelle en EUROS de la personne
 						portefeuilleCollection.findOne({name: "EUR"}, function(err, euros) {
 							// Si le solde est insuffisant
-							if(euros == null || euros.solde <= amount) {
+							if(euros == null || euros.solde < amount) {
 								res.json({
 									message: "Your amount in EUR is not sufficient"
 								});
@@ -161,7 +161,7 @@ module.exports = function(app, db) {
 						var equivalentEnEuro = amount * lastValueInEuro;
 
 						portefeuilleCollection.findOne({name: monnaie.name}, function(err, crypto) {
-							if(crypto == null || crypto.solde <= amount) {
+							if(crypto == null || crypto.solde < amount) {
 								res.json({
 									message: "You don't have enough "+monnaie.name+' you can\'t sold more than you have'
 								});
