@@ -32,9 +32,9 @@
         <div class="row">
           <div class="col-md-8">
             <h1 class="display-4">Afficher le cours d'une Crypto-Monnaie</h1>
-            <select id="monselect" class="custom-select my-4 lead" v-model="selected" @change="updateGraph">
-              <option class="form-control" value="null">Séléctionnez</option>
-              <option class="form-control" v-for="monnaie in monnaies" v-bind:value="monnaie.name">{{ monnaie.name }}</option>
+            <select id="monselect" class="custom-select my-4 lead form-control" v-model="selected" @change="updateGraph">
+              <option value="null">Séléctionnez</option>
+              <option v-for="monnaie in monnaies" v-bind:value="monnaie.name">{{ monnaie.name }}</option>
             </select>
             <div id="graphique" class="my-4 lead"></div>
           </div>
