@@ -58,13 +58,13 @@ module.exports = function(app, db) {
 			} else {
 				if(result2 == null) {
 					data = {
-						name: result.name,
+						name: result2.name,
 						solde: 0.0,
 						historique: []
 					};
 				} else {
 					data = {
-						name: result.name,
+						name: result2.name,
 						solde: result2.solde,
 						historique: result2.historique
 					};
