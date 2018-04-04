@@ -52,37 +52,24 @@ module.exports = function(app, db) {
 	});
 
 	app.get('/api/portefeuille/:monnaie', function(req, res, next) {
-		monnaiesCollection.findOne({name: req.params.monnaie}, function(err, result) {
+		portefeuilleCollection.findOne({name: req.params.monnaie}, function(err, result2) {
 			if(err) {
 				res.send(err);
 			} else {
-				if(result == null) {
-					res.status(404);
-					res.json({
-						message: "This monnaie doesn't exists !"
-					});
+				if(result2 == null) {
+					data = {
+						name: result.name,
+						solde: 0.0,
+						historique: []
+					};
 				} else {
-					portefeuilleCollection.findOne({name: req.params.monnaie}, function(err, result2) {
-						if(err) {
-							res.send(err);
-						} else {
-							if(result2 == null) {
-								data = {
-									name: result.name,
-									solde: 0.0,
-									historique: []
-								};
-							} else {
-								data = {
-									name: result.name,
-									solde: result2.solde,
-									historique: result2.historique
-								};
-							}
-							res.json(data);
-						}
-					});
+					data = {
+						name: result.name,
+						solde: result2.solde,
+						historique: result2.historique
+					};
 				}
+				res.json(data);
 			}
 		});
 	});
