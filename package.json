@@ -1,7 +1,7 @@
 {
-  "name": "getdata",
+  "name": "backoffice",
   "version": "1.0.0",
-  "description": "Get data from Cryptocompare API",
+  "description": "API Backoffice Project RTAI 2018",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,10 +14,6 @@
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "mongodb": "^3.0.4",
-    "morgan": "^1.9.0",
-    "request": "^2.85.0"
-  },
-  "dependencies": {
-    "npm": "^5.7.1"
+    "morgan": "^1.9.0"
   }
 }
